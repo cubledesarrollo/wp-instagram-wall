@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 class WP_API_Instagram
 {
-    private $access_token = "";
+    private $access_token = "240976113.4d307df.e0a133edcba44ec885c5c17ce4215b1f";
 
     private $end_point = "https://api.instagram.com/v1/";
 

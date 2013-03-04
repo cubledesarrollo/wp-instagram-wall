@@ -1,7 +1,7 @@
 var access_token = '240976113.4d307df.e0a133edcba44ec885c5c17ce4215b1f';
 var end_point = 'https://api.instagram.com/v1/';
 
-function build_box(src, caption)
+function build_box(src, caption, big)
 {
     var text = '';
     if (caption)
@@ -11,7 +11,13 @@ function build_box(src, caption)
     var img = $('<img src="'+src+'" title="'+text+'" alt="'+text+'"/>');
     var caption_div = $('<div class="caption">'+text+'</div>');
     
-    return $('<div class="box"></div>').append(img).append(caption_div).bind('mouseenter', function() {
+    var extra_class = '';
+    if (big)
+    {
+        extra_class = ' box-big';
+    }
+    
+    return $('<div class="box'+extra_class+'"></div>').append(img).append(caption_div).bind('mouseenter', function() {
         caption_div.fadeIn();
     }).bind('mouseleave', function() {
         caption_div.fadeOut();
@@ -44,6 +50,9 @@ function create_spin()
 
 function wp_instagram_wall()
 {
+    // Windows width
+    var ww = $(window).width();
+    
     // Spinner
     var spinner = create_spin();
     
@@ -63,12 +72,11 @@ function wp_instagram_wall()
         for (index in stream)
         {
             var data = stream[index];
-            console.log(data);
             var box = build_box(data.data.images.low_resolution.url, 
                     data.data.caption);
             if (index == 0)
                 box = build_box(data.data.images.standard_resolution.url,
-                        data.data.caption);
+                        data.data.caption, true);
             
             $container.append(box).imagesLoaded( function() {
                 $container.masonry('appended', box);

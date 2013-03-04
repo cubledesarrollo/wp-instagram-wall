@@ -18,7 +18,7 @@ body {
     float: left;
     cursor: pointer;
 }
-.box:first-child {
+.box-big {
     float: left;
     height: 622px;
 }
@@ -51,4 +51,26 @@ body {
     top: 20px;
     left: 20px;
     z-index: 1000;
+}
+
+@media (max-width: 608px) {
+    .box-big img {
+        width: 306px;
+        height: auto;
+    }
+    .box-big {
+        height: 311px;
+    }
+    #title {
+        background-image: url("../img/title.png");
+        background-color: transparent;
+        background-size: 260px auto;
+        width: 260px;
+        height: 48px;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+    }
+}
 }
