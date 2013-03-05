@@ -25,23 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-class WP_API_Instagram
-{
-    private $access_token = "240976113.4d307df.e0a133edcba44ec885c5c17ce4215b1f";
-
-    private $end_point = "https://api.instagram.com/v1/";
-
-    public function feed()
-    {
-        require_once plugin_dir_path(__FILE__)."library/Requests.php";
-        Requests::register_autoloader();
-        /*$request = Requests::get($this->end_point .
-                'users/self/feed?access_token='.$this->access_token);*/
-        var_dump($this->end_point .
-                'users/self/feed?access_token='.$this->access_token);
-    }
-}
-
 if(!class_exists('WP_Instagram_Wall'))
 {
     class WP_Instagram_Wall
@@ -51,11 +34,14 @@ if(!class_exists('WP_Instagram_Wall'))
          */
         public function __construct()
         {
-            // register actions
+            // Register settings
             add_action('admin_init', array(&$this, 'admin_init'));
             add_action('admin_menu', array(&$this, 'add_menu'));
+            // Register actions
             add_action('parse_request', array(&$this, 'wall'));
-        } // END public function __construct
+            
+            
+        }
 
         /**
          * Activate the plugin
@@ -63,30 +49,43 @@ if(!class_exists('WP_Instagram_Wall'))
         public static function activate()
         {
             // Do nothing
-        } // END public static function activate
-
+        }
+        
         /**
          * Deactivate the plugin
          */
         public static function deactivate()
         {
             // Do nothing
-        } // END public static function deactivate
+        }
         
         
         /**
          * Analiza la petición, si el nombre con que se accede se corresponde 
          * con la URL del wall, se carga el template.
          *  
-         * @param unknown_type $foo
+         * @param WP $wp
          */
         public function wall(&$wp)
         {
-            if (isset($wp->query_vars['name']) && $wp->query_vars['name'] == 'live')
+            $slug = get_option('slug');
+            if (!$slug)
+            {
+                $slug = 'live';
+            }
+            if (isset($wp->query_vars['name']) && $wp->query_vars['name'] == $slug)
             {
                 include 'templates/wall.php';
                 exit();
             }
+        }
+        
+        /**
+         * Initialize settings.
+         */
+        public function admin_init()
+        {
+            $this->init_settings();
         }
         
         /**
@@ -95,9 +94,37 @@ if(!class_exists('WP_Instagram_Wall'))
         public function init_settings()
         {
             // register the settings for this plugin
-            register_setting('wp_instagram_wall-group', 'setting_a');
-            register_setting('wp_instagram_wall-group', 'setting_b');
-        } // END public function init_custom_settings()
+            register_setting('wp_instagram_wall-group', 'title');
+            register_setting('wp_instagram_wall-group', 'slug');
+            register_setting('wp_instagram_wall-group', 'access_token');
+            
+        }
+        
+        /**
+         * Add menu page
+         */
+        public function add_menu()
+        {
+            add_options_page('Instagram Wall Settings', 'Instagram Wall', 
+                    'manage_options', 'wp_instagram_wall', 
+                    array(&$this, 'plugin_settings_page'));
+        }
+        
+        /**
+         * Menu Callback
+         */
+        public function plugin_settings_page()
+        {
+            if(!current_user_can('manage_options'))
+            {
+                wp_die(__('You do not have sufficient permissions to access this page.'));
+            }
+        
+            // Render the settings template
+            include(sprintf("%s/templates/settings.php", dirname(__FILE__)));
+            
+        }
+        
         
     } // END class WP_Plugin_Template
 } // END if(!class_exists('WP_Plugin_Template'))
@@ -112,5 +139,17 @@ if(class_exists('WP_Instagram_Wall'))
     $wp_instagram_wall = new WP_Instagram_Wall();
 }
 
+// Add a link to the settings page onto the plugin page
+if(isset($wp_instagram_wall))
+{
+    // Add the settings link to the plugins page
+    function plugin_settings_link($links)
+    {
+        $settings_link = '<a href="options-general.php?page=wp_instagram_wall">Settings</a>';
+        array_unshift($links, $settings_link);
+        return $links;
+    }
 
-
+    $plugin = plugin_basename(__FILE__);
+    add_filter("plugin_action_links_$plugin", 'plugin_settings_link');
+}

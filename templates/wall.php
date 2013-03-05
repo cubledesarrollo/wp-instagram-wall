@@ -3,7 +3,11 @@
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>" />
     <meta name="viewport" content="width=device-width" />
-    <title><?php bloginfo('name'); ?> | Live </title>
+    <?php if (get_option('title')): ?>
+    <title><?php echo get_option('title') ?> </title>
+    <?php else: ?>
+    <title><?php bloginfo('name'); ?> | Instagram Wall </title>
+    <?php endif; ?>
     <link rel="shortcut icon" href="<?php bloginfo('stylesheet_directory'); ?>/favicon.ico" />
     <?php // Loads HTML5 JavaScript file to add support for HTML5 elements in older IE versions. ?>
     <!--[if lt IE 9]>
@@ -21,6 +25,9 @@
 <div id="title"></div>
 <div id="container">
 </div>
-<script type="text/javascript">wp_instagram_wall();</script>
+<script type="text/javascript">
+var access_token = "<?php echo get_option('access_token')?>";
+wp_instagram_wall();
+</script>
 </body>
 </html>

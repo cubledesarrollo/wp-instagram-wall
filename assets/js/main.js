@@ -1,4 +1,3 @@
-var access_token = '240976113.4d307df.e0a133edcba44ec885c5c17ce4215b1f';
 var end_point = 'https://api.instagram.com/v1/';
 
 function build_box(src, caption, big)
